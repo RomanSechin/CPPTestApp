@@ -25,15 +25,8 @@ public:
   }
 
   ~Node() {
-    if (left) {
-      std::cout << "Deleting node with value " << left->data << std::endl;
-      delete (left);
-    }
-    //delete (data);
-    if (right) {
-      std::cout << "Deleting node with value " << right->data << std::endl;
-      delete (right);
-    }
+    if (left) delete (left);
+    if (right)  delete (right);
   }
 
   void print_node() {
@@ -52,12 +45,14 @@ public:
   }
 
   void add_item(T item) {
+    if (tree_root == nullptr) { 
+      tree_root = new Node<T>(item); 
+      return; 
+    }
     add_item(item, tree_root);
   }
 
   void add_item(T item, Node<T> * nd) {
-    if (item == (T)nullptr) return;
-    if (tree_root == nullptr) { tree_root = new Node<T>(item); return; }
     if (nd->data > item) {
       if (nd->left)
         add_item(item, nd->left);
@@ -81,7 +76,7 @@ public:
       return;
     }
     if (nd->left)
-    print_tree(nd->left);
+      print_tree(nd->left);
 
     nd->print_node();
 
@@ -91,42 +86,44 @@ public:
   }
 
   ~Tree() {
-    if(tree_root) delete tree_root;
+    if (tree_root) {
+      delete tree_root;
+    }
   }
 };//TREE
 
 
 template <typename T>
 class TreeContainer {
- 
-    Tree<T> * tree;
+
+  Tree<T>* tree;
 public:
-    TreeContainer() {
-      tree = nullptr;
-    }
-    TreeContainer(T data) {
-      tree = new Tree<T>(data);
-    }
+  TreeContainer() {
+    tree = nullptr;
+  }
+  TreeContainer(T data) {
+    tree = new Tree<T>(data);
+  }
 
-    ~TreeContainer() {
-      if(tree) delete tree;
-    }
+  ~TreeContainer() {
+    if (tree) delete tree;
+  }
 
-    void add_item(T item) {
-      if(!tree)
-        tree = new Tree<T>(item);
-      else
-        tree->add_item(item);
-    }
+  void add_item(T item) {
+    if (!tree)
+      tree = new Tree<T>(item);
+    else
+      tree->add_item(item);
+  }
 
-    void print_tree() {
-      if (!tree)
-        std::cout << "Tree is empty!" << std::endl;
+  void print_tree() {
+    if (!tree)
+      std::cout << "Tree is empty!" << std::endl;
 
-      tree->print_tree();
-    }
+    tree->print_tree();
+  }
 
-  };
+};
 
 int main()
 {
@@ -138,6 +135,6 @@ int main()
 
   tc->print_tree();
 
-  delete &tc;
+  delete tc;
 };
 
