@@ -25,9 +25,15 @@ public:
   }
 
   ~Node() {
-    if(left)  delete (left);
+    if (left) {
+      std::cout << "Deleting node with value " << left->data << std::endl;
+      delete (left);
+    }
     //delete (data);
-    if(right) delete (right);
+    if (right) {
+      std::cout << "Deleting node with value " << right->data << std::endl;
+      delete (right);
+    }
   }
 
   void print_node() {
@@ -85,7 +91,7 @@ public:
   }
 
   ~Tree() {
-    delete tree_root;
+    if(tree_root) delete tree_root;
   }
 };//TREE
 
@@ -103,7 +109,7 @@ public:
     }
 
     ~TreeContainer() {
-      delete tree;
+      if(tree) delete tree;
     }
 
     void add_item(T item) {
