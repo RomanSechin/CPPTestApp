@@ -1,4 +1,4 @@
-﻿// 
+// 
 // Написать класс,  работающий как контейнер на базе бинарного дерева
 // Организовать обход дерева в глубину с выводом элементов в порядке сортировки
 // Простое бинарное дерево, без крассно-черных и без 234 балансировок
@@ -6,138 +6,97 @@
 // Отправить ссылку на git-репозиторий
 //
 #include <iostream>
-#include <time.h>
+#include <memory>
+#include <cstdlib>
+#include <ctime>
 
 template<typename T>
 class Node {
 public:
   T data;
-  Node* left;
-  Node* right;
-public:
-  Node() {
-    data  = nullptr;
-    left  = nullptr;
-    right = nullptr;
-  }
-  Node(T data) {
-    this->data = data;
-  }
+  std::unique_ptr<Node> left;
+  std::unique_ptr<Node> right;
 
-  ~Node() {
-    if (left) {
-      std::cout << "Deleting node with value " << left->data << std::endl;
-      delete (left);
-    }
-    //delete (data);
-    if (right) {
-      std::cout << "Deleting node with value " << right->data << std::endl;
-      delete (right);
-    }
-  }
+  Node(T data) : data(data), left(nullptr), right(nullptr) {}
 
   void print_node() {
     std::cout << data << " ";
   }
-};//NODE
+};
 
 template <typename T>
 class Tree {
-  Node<T> * tree_root = nullptr;
+  std::unique_ptr<Node<T>> tree_root;
 
 public:
-  Tree() { tree_root = nullptr; }
-  Tree(T data) {
-    tree_root = new Node<T>(data);
-  }
+  Tree() : tree_root(nullptr) {}
 
   void add_item(T item) {
     add_item(item, tree_root);
   }
 
-  void add_item(T item, Node<T> * nd) {
-    if (item == (T)nullptr) return;
-    if (tree_root == nullptr) { tree_root = new Node<T>(item); return; }
+  void add_item(T item, std::unique_ptr<Node<T>>& nd) {
+    if (!nd) {
+      nd = std::make_unique<Node<T>>(item);
+      return;
+    }
     if (nd->data > item) {
-      if (nd->left)
-        add_item(item, nd->left);
-      else
-        nd->left = new Node<T>(item);
+      add_item(item, nd->left);
     }
     else if (nd->data < item) {
-      if (nd->right)
-        add_item(item, nd->right);
-      else
-        nd->right = new Node<T>(item);
+      add_item(item, nd->right);
     }
-  };
+  }
 
   void print_tree() {
-    print_tree(tree_root);
-  }
-  void print_tree(Node<T>* nd) {
-    if (tree_root == nullptr) {
+    if (!tree_root) {
       std::cout << "Tree is empty!" << std::endl;
       return;
     }
-    if (nd->left)
-    print_tree(nd->left);
+    print_tree(tree_root.get());
+  }
 
+  void print_tree(Node<T>* nd) {
+    if (nd->left) {
+      print_tree(nd->left.get());
+    }
     nd->print_node();
-
-    if (nd->right)
-      print_tree(nd->right);
-
+    if (nd->right) {
+      print_tree(nd->right.get());
+    }
   }
-
-  ~Tree() {
-    if(tree_root) delete tree_root;
-  }
-};//TREE
-
+};
 
 template <typename T>
 class TreeContainer {
- 
-    Tree<T> * tree;
+  std::unique_ptr<Tree<T>> tree;
+
 public:
-    TreeContainer() {
-      tree = nullptr;
+  TreeContainer() : tree(nullptr) {}
+
+  void add_item(T item) {
+    if (!tree) {
+      tree = std::make_unique<Tree<T>>();
     }
-    TreeContainer(T data) {
-      tree = new Tree<T>(data);
-    }
-
-    ~TreeContainer() {
-      if(tree) delete tree;
-    }
-
-    void add_item(T item) {
-      if(!tree)
-        tree = new Tree<T>(item);
-      else
-        tree->add_item(item);
-    }
-
-    void print_tree() {
-      if (!tree)
-        std::cout << "Tree is empty!" << std::endl;
-
-      tree->print_tree();
-    }
-
-  };
-
-int main()
-{
-  srand((unsigned)time(NULL));
-  TreeContainer<int> * tc = new TreeContainer<int>();
-  for (int i = 0; i < 20; ++i) {
-    tc->add_item(rand() % 100);
+    tree->add_item(item);
   }
 
-  tc->print_tree();
-
-  delete &tc;
+  void print_tree() {
+    if (!tree) {
+      std::cout << "Tree is empty!" << std::endl;
+      return;
+    }
+    tree->print_tree();
+  }
 };
 
+int main() {
+  srand(static_cast<unsigned>(time(nullptr)));
+  TreeContainer<int> tc;
+  for (int i = 0; i < 20; ++i) {
+    tc.add_item(rand() % 100);
+  }
+
+  tc.print_tree();
+  return 0;
+}
