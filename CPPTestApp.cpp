@@ -15,13 +15,12 @@ public:
   Node* left;
   Node* right;
 public:
-  Node() {
-    data  = nullptr;
-    left  = nullptr;
-    right = nullptr;
+  Node() { 
   }
   Node(T data) {
     this->data = data;
+    left  = nullptr;
+    right = nullptr;
   }
 
   ~Node() {
@@ -36,32 +35,32 @@ public:
 
 template <typename T>
 class Tree {
-  Node<T> * tree_root = nullptr;
+  Node<T>* tree_root;
 
 public:
-  Tree() { tree_root = nullptr; }
+  Tree() { }
   Tree(T data) {
     tree_root = new Node<T>(data);
   }
 
   void add_item(T item) {
-    if (tree_root == nullptr) { 
-      tree_root = new Node<T>(item); 
-      return; 
-    }
-    add_item(item, tree_root);
+    if (tree_root == nullptr) 
+      tree_root = new Node<T>(item);       
+    else 
+      add_item2(item, tree_root);
   }
 
-  void add_item(T item, Node<T> * nd) {
+  void add_item2(T item, Node<T> * nd) {
+    if (nd == nullptr) return;
     if (nd->data > item) {
       if (nd->left)
-        add_item(item, nd->left);
+        add_item2(item, nd->left);
       else
         nd->left = new Node<T>(item);
     }
     else if (nd->data < item) {
       if (nd->right)
-        add_item(item, nd->right);
+        add_item2(item, nd->right);
       else
         nd->right = new Node<T>(item);
     }
@@ -71,6 +70,7 @@ public:
     print_tree(tree_root);
   }
   void print_tree(Node<T>* nd) {
+    if (!nd) return;
     if (tree_root == nullptr) {
       std::cout << "Tree is empty!" << std::endl;
       return;
@@ -110,7 +110,7 @@ public:
   }
 
   void add_item(T item) {
-    if (!tree)
+    if (tree == nullptr)
       tree = new Tree<T>(item);
     else
       tree->add_item(item);
@@ -137,4 +137,3 @@ int main()
 
   delete tc;
 };
-
